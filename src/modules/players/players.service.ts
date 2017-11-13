@@ -1,41 +1,23 @@
-import { Component } from '@nestjs/common'
+import { Component } from '@nestjs/common';
 import { Player } from './players.model';
 
 @Component()
 export class PlayerService {
+    private _existingPlayers:Map<string, Player>
 
-    private _players:Map<string, Player>;
-    
     constructor() {
-        this._players = new Map<string, Player>();
+        this._existingPlayers = new Map<string, Player>();
     }
 
-    public async getById(id: string):Promise<Player> {
-        return await new Promise<Player>((resolve, reject)=>{
-            resolve(this._players.get(id));
-            resolve();
-        })
+    create(player:Player) {
+        this._existingPlayers.set(player.getID(), player);
     }
 
-    public register(player:Player, callback:(existingPlayer:Player)=>void):void {
-        for (let existingPlayer of this._players.values()) {
-            callback(existingPlayer)
-        }
-        this._players.set(player.getID(),player);
+    delete(id:string) {
+        this._existingPlayers.delete(id);
     }
 
-    public async delete(id: string):Promise<any> {
-        return await new Promise<Player>(async (resolve, reject)=>{
-            const removePlayer = await this.getById(id);
-                // Player not found
-                if (!removePlayer) {
-                    console.log("Player not found: "+ id);
-                    resolve();
-                    return;
-                };
-                this._players.delete(id);
-                resolve();
-        });
+    public get players(): Map<string, Player> {
+        return this._existingPlayers;
     }
-
 }
