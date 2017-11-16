@@ -1,4 +1,5 @@
 import { EnemyEvent } from './../enemies/enemies.enum';
+import { CoinEvent } from './../coins/coins.enum';
 import { Player } from './players.model';
 import { PlayerService } from './players.service';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection } from '@nestjs/websockets';
@@ -49,8 +50,14 @@ export class PlayersGateway {
     }
 
     @SubscribeMessage(EnemyEvent.Respawn)
-    public async handleRemoveEnemy(client, data){
+    public async handleRespawnEnemy(client, data){
         client.emit(EnemyEvent.Respawn, {index: data.index});
         client.broadcast.emit(EnemyEvent.Respawn, {index: data.index});
+    }
+
+    @SubscribeMessage(CoinEvent.Respawn)
+    public async handleRespawnCoin(client, data){
+        client.emit(CoinEvent.Respawn, {newPosition: data.newPosition});
+        client.broadcast.emit(CoinEvent.Respawn, {newPosition: data.newPosition});
     }
 }
